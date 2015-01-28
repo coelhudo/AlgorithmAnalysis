@@ -1,4 +1,4 @@
-module InversionCounter (count) where
+module Main (main,count,countFromFile) where
 
 import Data.List
 
@@ -24,4 +24,13 @@ mergesort (xs, ic) = merge (if len > 2 then (f (mergesort (left, ic)) (mergesort
 
 count :: (Ord a, Num c) => [a] -> c
 count xs = snd $ mergesort (xs, 0)
+
+main = do
+       contents <- readFile "IntegerArray.txt"
+       print . count . map readInt . lines $ contents
+
+readInt :: String -> Int
+readInt = read
+
+countFromFile = main
 
