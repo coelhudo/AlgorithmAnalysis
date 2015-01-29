@@ -12,11 +12,11 @@ merge ((x:xs), (y:ys), ic) | x <= y = (x : fst leftMerge, snd leftMerge)
                            where leftMerge = (merge (xs, (y:ys), ic))
                                  rightMerge = (merge ((x:xs), ys, ic + 1))
 
-f :: (Ord a, Num c) => ([a], c) -> ([a], c) -> ([a], [a], c)
-f (xs, lic) (ys, ric) = (xs, ys, lic + ric)
+combineResults :: (Ord a, Num c) => ([a], c) -> ([a], c) -> ([a], [a], c)
+combineResults (xs, lic) (ys, ric) = (xs, ys, lic + ric)
 
 mergesort :: (Ord a, Num c) => ([a], c) -> ([a], c)
-mergesort (xs, ic) = merge (if len > 2 then (f (mergesort (left, ic)) (mergesort (right, ic))) else (left, right, ic))
+mergesort (xs, ic) = merge (if len > 2 then (combineResults (mergesort (left, ic)) (mergesort (right, ic))) else (left, right, ic))
                where len = length xs
                      splitted = splitAt (len `div`2) xs
                      left = fst splitted
