@@ -1,26 +1,37 @@
-import Data.List
+module Main (main,sort,swap,qspart) where
 
-qspart :: (Ord a) => [a] -> Int -> Int -> ([a],Int)
-qspart [] _ _ = ([],0)
-qspart xs i j | j == genericLength xs = ((swapElts (i-1) 0 xs),(i-1)) -- need to change pivot place
-              | xs!!j < head xs = qspart (swapElts i j xs) (i+1) (j+1)
-              | xs!!j > head xs = qspart xs i (j+1)
+import qualified Data.List as DataList
 
-qspartition :: (Ord a) => [a] -> ([a],Int)
-qspartition xs = qspart xs 1 1
+main = do
+       contents <- readFile "QuickSort.txt"
+       print . snd . Main.sort . map readInt . lines $ contents
 
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort [a] = [a]
-quicksort xs = quicksort leftSide ++ [pivot] ++ quicksort rightSide
-            where leftSide = take pivotPosition partitioned
-                  rightSide = drop (pivotPosition+1) partitioned
-                  pivot = partitioned !! pivotPosition
-                  (partitioned,pivotPosition) = qspartition xs
+readInt :: String -> Int
+readInt = read
 
--- https://gist.github.com/ijt/2010183
-swapElts i j ls = [get k x | (k, x) <- zip [0..length ls - 1] ls]
-    where get k x | k == i = ls !! j
-                  | k == j = ls !! i
-                  | otherwise = x
+sort :: (Ord a) => [a] -> ([a],Int)
+sort xs = quicksort xs
 
+quicksort :: (Ord a) => [a] -> ([a],Int)
+quicksort [] = ([],0)
+quicksort [a] = ([a],1)
+quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, leftSortedTotal + rightSortedTotal)
+            where (leftSorted,leftSortedTotal) = quicksort leftPartition
+                  (rightSorted,rightSortedTotal) = quicksort rightPartition
+                  leftPartition = take pivotIndex partitioned
+                  rightPartition = drop (pivotIndex+1) partitioned
+                  pivot = partitioned !! pivotIndex
+                  (partitioned,pivotIndex) = qspartition xs
+
+qspartition :: (Ord a) => [a] -> ([a], Int)
+qspartition xs = qspart 1 1 xs
+
+qspart :: (Ord a) => Int -> Int -> [a] -> ([a], Int)
+qspart _ _ [] = ([], 0)
+qspart i j xs | j == DataList.genericLength xs = ((swap 0 (i - 1) xs),(i-1)) -- need to change pivot place
+                | xs!!j < head xs = qspart (i+1) (j+1) (swap i j xs)
+                | xs!!j > head xs = qspart i (j+1) xs
+
+swap :: (Ord a) => Int -> Int -> [a] -> [a]
+swap i j xs | i /= j = take i xs ++ [xs!!j] ++ (drop (i+1) $ take j xs) ++ [xs!!i] ++ drop (j+1) xs
+                | otherwise = xs
