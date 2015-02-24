@@ -1,9 +1,12 @@
 module Main (main,sort,swap,qspart) where
+--module Main (qspartition) where
 
 import qualified Data.List as DataList
+import System.Environment (getArgs)
 
 main = do
-       contents <- readFile "QuickSort.txt"
+       args <- getArgs
+       contents <- readFile $ args !! 0
        print . snd . Main.sort . map readInt . lines $ contents
 
 readInt :: String -> Int
@@ -15,7 +18,7 @@ sort xs = quicksort xs
 quicksort :: (Ord a) => [a] -> ([a],Int)
 quicksort [] = ([],0)
 quicksort [a] = ([a],1)
-quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, leftSortedTotal + rightSortedTotal)
+quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length leftSorted + length rightSorted + leftSortedTotal + rightSortedTotal)
             where (leftSorted,leftSortedTotal) = quicksort leftPartition
                   (rightSorted,rightSortedTotal) = quicksort rightPartition
                   leftPartition = take pivotIndex partitioned
@@ -24,13 +27,14 @@ quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, leftSortedTotal + rightSor
                   (partitioned,pivotIndex) = qspartition xs
 
 qspartition :: (Ord a) => [a] -> ([a], Int)
-qspartition xs = qspart 1 1 xs
+qspartition (x:xs) = qspart 0 0 x xs
 
-qspart :: (Ord a) => Int -> Int -> [a] -> ([a], Int)
-qspart _ _ [] = ([], 0)
-qspart i j xs | j == DataList.genericLength xs = ((swap 0 (i - 1) xs),(i-1)) -- need to change pivot place
-                | xs!!j < head xs = qspart (i+1) (j+1) (swap i j xs)
-                | xs!!j > head xs = qspart i (j+1) xs
+qspart :: (Ord a) => Int -> Int -> a -> [a] -> ([a],Int)
+qspart _ index pivot [] = ([pivot],index)
+qspart j index pivot xs | j == DataList.genericLength xs = (pivot : xs,index)
+                        | xs!!j < pivot = (xs!!j : list, listIndex)
+                        | otherwise = qspart (j+1) index pivot xs
+                        where (list,listIndex) = qspart j (index+1) pivot (drop 1 $ swap 0 j xs)
 
 swap :: (Ord a) => Int -> Int -> [a] -> [a]
 swap i j xs | i > j = swap j i xs
