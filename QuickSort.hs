@@ -33,5 +33,6 @@ qspart i j xs | j == DataList.genericLength xs = ((swap 0 (i - 1) xs),(i-1)) -- 
                 | xs!!j > head xs = qspart i (j+1) xs
 
 swap :: (Ord a) => Int -> Int -> [a] -> [a]
-swap i j xs | i /= j = take i xs ++ [xs!!j] ++ (drop (i+1) $ take j xs) ++ [xs!!i] ++ drop (j+1) xs
-                | otherwise = xs
+swap i j xs | i > j = swap j i xs
+            | i < j = take i xs ++ [xs!!j] ++ (drop (i+1) $ take j xs) ++ [xs!!i] ++ drop (j+1) xs
+            | otherwise = xs
