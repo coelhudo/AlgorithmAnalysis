@@ -1,4 +1,4 @@
-module Main (main,sort,swap,qspart) where
+module Main (main,sort,swap,qspart,qspartition) where
 
 import qualified Data.List as DataList
 import System.Environment (getArgs)
@@ -26,8 +26,15 @@ quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length xs - 1 + leftSorted
                   (partitioned,pivotIndex) = qspartition xs
 
 qspartition :: (Ord a) => [a] -> ([a], Int)
-qspartition (x:xs) = (swap 0 index (x:partitioned),index)
+qspartition xs = qspartitionLast xs
+
+qspartitionFirst :: (Ord a) => [a] -> ([a], Int)
+qspartitionFirst (x:xs) = (swap 0 index (x:partitioned),index)
                      where (partitioned,index) = qspart 0 0 x xs
+
+qspartitionLast :: (Ord a) => [a] -> ([a], Int)
+qspartitionLast xs = (swap 0 index (last xs:partitioned),index)
+                     where (partitioned,index) = qspart 0 0 (last xs) ((init $ drop 1 xs) ++ [head xs])
 
 qspart :: (Ord a) => Int -> Int -> a -> [a] -> ([a],Int)
 qspart _ index pivot [] = ([],index)
