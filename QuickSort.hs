@@ -1,5 +1,4 @@
 module Main (main,sort,swap,qspart) where
---module Main (qspartition) where
 
 import qualified Data.List as DataList
 import System.Environment (getArgs)
@@ -17,8 +16,8 @@ sort xs = quicksort xs
 
 quicksort :: (Ord a) => [a] -> ([a],Int)
 quicksort [] = ([],0)
-quicksort [a] = ([a],1)
-quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length leftSorted + length rightSorted + leftSortedTotal + rightSortedTotal)
+quicksort [a] = ([a],0)
+quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length xs - 1 + leftSortedTotal + rightSortedTotal)
             where (leftSorted,leftSortedTotal) = quicksort leftPartition
                   (rightSorted,rightSortedTotal) = quicksort rightPartition
                   leftPartition = take pivotIndex partitioned
@@ -27,11 +26,12 @@ quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length leftSorted + length
                   (partitioned,pivotIndex) = qspartition xs
 
 qspartition :: (Ord a) => [a] -> ([a], Int)
-qspartition (x:xs) = qspart 0 0 x xs
+qspartition (x:xs) = (swap 0 index (x:partitioned),index)
+                     where (partitioned,index) = qspart 0 0 x xs
 
 qspart :: (Ord a) => Int -> Int -> a -> [a] -> ([a],Int)
-qspart _ index pivot [] = ([pivot],index)
-qspart j index pivot xs | j == DataList.genericLength xs = (pivot : xs,index)
+qspart _ index pivot [] = ([],index)
+qspart j index pivot xs | j == DataList.genericLength xs = (xs,index)
                         | xs!!j < pivot = (xs!!j : list, listIndex)
                         | otherwise = qspart (j+1) index pivot xs
                         where (list,listIndex) = qspart j (index+1) pivot (drop 1 $ swap 0 j xs)
