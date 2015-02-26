@@ -1,4 +1,4 @@
-module Main (main,sort,swap,qspart,qspartition) where
+module Main (main,sort) where
 
 import qualified Data.List as DataList
 import System.Environment (getArgs)
@@ -26,7 +26,7 @@ quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length xs - 1 + leftSorted
                   (partitioned,pivotIndex) = qspartition xs
 
 qspartition :: (Ord a) => [a] -> ([a], Int)
-qspartition xs = qspartitionLast xs
+qspartition xs = qspartitionMedian xs
 
 qspartitionFirst :: (Ord a) => [a] -> ([a], Int)
 qspartitionFirst (x:xs) = (swap 0 index (x:partitioned),index)
@@ -35,6 +35,24 @@ qspartitionFirst (x:xs) = (swap 0 index (x:partitioned),index)
 qspartitionLast :: (Ord a) => [a] -> ([a], Int)
 qspartitionLast xs = (swap 0 index (last xs:partitioned),index)
                      where (partitioned,index) = qspart 0 0 (last xs) ((init $ drop 1 xs) ++ [head xs])
+
+qspartitionMedian :: (Ord a) => [a] -> ([a], Int)
+qspartitionMedian [x,y] | x > y = ([y,x],0)
+                        | otherwise = ([x,y],0)
+qspartitionMedian xs = (swap 0 index (pivot:partitioned),index)
+                       where (partitioned,index) = qspart 0 0 pivot (drop 1 $ swap 0 pivotIndex xs)
+                             (pivot,pivotIndex) = selectMedian firstElement middleElement lastElement
+                             firstElement = (head xs,0)
+                             lastElement = (last xs, length xs - 1)
+                             middleElement = getMiddleElement xs
+
+getMiddleElement :: (Ord a) => [a] -> (a,Int)
+getMiddleElement xs = (xs !! index, index)
+                      where size = length xs
+                            index = if odd size then size `div` 2 else size `div` 2 - 1
+
+selectMedian :: (Ord a) => (a,Int) -> (a,Int) -> (a,Int) -> (a,Int)
+selectMedian first middle last = let xs = DataList.sort [first,middle,last] in xs !! 1
 
 qspart :: (Ord a) => Int -> Int -> a -> [a] -> ([a],Int)
 qspart _ index pivot [] = ([],index)
