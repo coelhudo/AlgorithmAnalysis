@@ -26,7 +26,7 @@ quicksort xs = (leftSorted ++ [pivot] ++ rightSorted, length xs - 1 + leftSorted
                   (partitioned,pivotIndex) = qspartition xs
 
 qspartition :: (Ord a) => [a] -> ([a], Int)
-qspartition xs = qspartitionMedian xs
+qspartition xs = qspartitionFirst xs
 
 qspartitionFirst :: (Ord a) => [a] -> ([a], Int)
 qspartitionFirst (x:xs) = (swap 0 index (x:partitioned),index)
